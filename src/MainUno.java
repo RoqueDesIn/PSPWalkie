@@ -21,6 +21,7 @@ public class MainUno {
 			switch (entrada) {
 			case "1":
 	 			pintaMenu("Manolo su servidor");
+				mensaje="";
 				// Crea servidor
 				server= new FlujoServer(puerto);
 				iAmServer(server);
@@ -29,6 +30,7 @@ public class MainUno {
 				break;
 			case "2":
 	 			pintaMenu("Pepe su cliente");
+				mensaje="";
 				// crea el cliente
 				client= new FlujoClient(puerto);
 				// mientras no reciba "cambio y corto envia y recibe
@@ -54,11 +56,17 @@ public class MainUno {
 			// envía mensaje mientras que no reciba cambio
 			mensaje="";
 			while (!mensaje.startsWith("cambio")) {
-				// solicita el mensaje
-				System.out.println("Manolo introduzca mensaje a enviar: ");
-				mensaje = sc.nextLine();
-				// envia el mensaje
-				server.serverSend(mensaje);
+				if (!mensaje.startsWith("cambio y corto")) {
+					// solicita el mensaje
+					System.out.println("Manolo introduzca mensaje a enviar: ");
+					mensaje = sc.nextLine();
+					// envia el mensaje
+					server.serverSend(mensaje);
+				} else {
+					// envia el mensaje y corta
+					server.serverSend(mensaje);
+					mensaje="cambio";
+				}
 			}
 			// mientras que el servidor sea distinto de cambio recibe
 			mensaje = "";
@@ -82,15 +90,21 @@ public class MainUno {
 				// envia el mensaje
 				mensaje=client.clientReceive();
 			}
-			// envía mensaje mientras que no reciba cambio
-			mensaje="";
-			while (!mensaje.startsWith("cambio")) {
-				// solicita el mensaje
-				System.out.println("Pepe introduzca mensaje a enviar: ");
-				mensaje = sc.nextLine();
-				// envia el mensaje
-				client.clientSend(mensaje);
-			}
+			//envía mensajes de forma recursiva hasta que reciba camio y corto o cambio
+			if (!mensaje.startsWith("cambio y corto")) {
+				mensaje="";
+				while (!mensaje.startsWith("cambio") ) {
+					// solicita el mensaje
+					System.out.println("Pepe introduzca mensaje a enviar: ");
+					mensaje = sc.nextLine();
+					// envia el mensaje
+					client.clientSend(mensaje);
+				} 
+						
+			} else {
+				// envia el mensaje y corta la conversación
+				client.clientSend(mensaje);		
+			}			
 		}
 	}
 	
