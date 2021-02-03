@@ -20,7 +20,7 @@ public class MainUno {
 			// switch tecla
 			switch (entrada) {
 			case "1":
-	 			pintaMenu("Manolo");
+	 			pintaMenu("Manolo su servidor");
 				// Crea servidor
 				server= new FlujoServer(puerto);
 				iAmServer(server);
@@ -28,7 +28,7 @@ public class MainUno {
 				server.serverClose();
 				break;
 			case "2":
-	 			pintaMenu("Pepe");
+	 			pintaMenu("Pepe su cliente");
 				// crea el cliente
 				client= new FlujoClient(puerto);
 				// mientras no reciba "cambio y corto envia y recibe
