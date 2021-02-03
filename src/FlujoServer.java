@@ -47,19 +47,21 @@ public class FlujoServer {
 	 * Creamos flujo de entrada al servidor
 	 * y recibimos mensaje del cliente
 	 */
-	public void serverReceive () {
+	public String serverReceive () {
+		String mensaje="";
         try {
         	// CREO FLUJO DE ENTRADA DEL CLIENTE   
 	        entrada = clienteConectado.getInputStream();
 	        flujoEntrada = new DataInputStream(entrada);
-	       
+	       mensaje=flujoEntrada.readUTF();
 	        // EL CLIENTE ME ENVIA UN MENSAJE
-	        System.out.println("Recibiendo del CLIENTE: \n\t" + flujoEntrada.readUTF());
+	        System.out.println("Recibiendo del CLIENTE: \n\t" + mensaje);
 	        
         } catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}  
+        return mensaje;
 	}
 	
 	/**

@@ -1,19 +1,12 @@
-import java.rmi.server.ServerCloneException;
-import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MainUno {
 
-	
+	static Scanner sc= new Scanner (System.in);
+	static String mensaje="";
 	public static void main(String[] args) {
-		String menu="*******************************\n"+
-				   "             Walkie UNO\n"+
-				   "*******************************\n"
-					+ "1. Hablar \r\n" + 
-					"2. Esperar a recibir mensaje \r\n" + 
-					"3. Salir";
-		Scanner sc= new Scanner (System.in);
-		String mensaje=null;
+	
+		// definición de variables
 		FlujoServer server=null;
 		FlujoClient client=null;
 		int puerto= 6125;
@@ -21,31 +14,25 @@ public class MainUno {
 		// Escribe el menú
 		while (true) {
 			// esribe el menú
-			System.out.println(menu);
+			pintaMenu("De momento nadie");
 			// gestiona el menú
 			String entrada= sc.nextLine();
 			// switch tecla
 			switch (entrada) {
 			case "1":
-				// se queda esperando handshake
+	 			pintaMenu("Manolo");
+				// Crea servidor
 				server= new FlujoServer(puerto);
-				// recibe handshake
-				server.serverReceive();
-				// solicita el mensaje
-				System.out.println("introduzca mensaje a enviar: ");
-				mensaje = sc.nextLine();
-				// envia el mensaje
-				server.serverSend(mensaje);
+				iAmServer(server);
 				// cierra el server
 				server.serverClose();
-	 			System.out.println(menu);
 				break;
 			case "2":
-				// Esperar mensaje, se convierte en cliente y espera mensaje
-				// de saludo del servidor
+	 			pintaMenu("Pepe");
+				// crea el cliente
 				client= new FlujoClient(puerto);
-				// recibe handshake
-				client.clientReceive();
+				// mientras no reciba "cambio y corto envia y recibe
+				iAmClient(client);
 				// cierra el cliente
 				client.clientClose();
 				break;
@@ -55,4 +42,72 @@ public class MainUno {
 		        }
 		}
 	}
+	
+	/**
+	 * parte del servidor
+	 * @param server
+	 */
+	private static void iAmServer(FlujoServer server) {	
+		
+		// mientras no reciba "cambio y corto envia y recibe
+		while (!mensaje.contains("cambio y corto")) {
+			// envía mensaje mientras que no reciba cambio
+			mensaje="";
+			while (!mensaje.startsWith("cambio")) {
+				// solicita el mensaje
+				System.out.println("Manolo introduzca mensaje a enviar: ");
+				mensaje = sc.nextLine();
+				// envia el mensaje
+				server.serverSend(mensaje);
+			}
+			// mientras que el servidor sea distinto de cambio recibe
+			mensaje = "";
+			while (!mensaje.startsWith("cambio")) {
+				// envia el mensaje
+				mensaje=server.serverReceive();
+			}
+		}
+	}
+	/**
+	 * Parte del cliente
+	 * @param client
+	 */
+	private static void iAmClient (FlujoClient client) {
+		
+		// mientras no reciba "cambio y corto" recibe y envia
+		while (!mensaje.contains("cambio y corto")) {
+			mensaje="";
+			// mientras que el servidor sea distinto de cambio recibe
+			while (!mensaje.startsWith("cambio")) {
+				// envia el mensaje
+				mensaje=client.clientReceive();
+			}
+			// envía mensaje mientras que no reciba cambio
+			mensaje="";
+			while (!mensaje.startsWith("cambio")) {
+				// solicita el mensaje
+				System.out.println("Pepe introduzca mensaje a enviar: ");
+				mensaje = sc.nextLine();
+				// envia el mensaje
+				client.clientSend(mensaje);
+			}
+		}
+	}
+	
+/**
+ * Pinta el menú
+ * @param whoAmI
+ */
+	private static void pintaMenu(String whoAmI) {
+		String menu="*******************************\n"+
+				   "             Walkie " + whoAmI
+				   + "\n"+
+				   "*******************************\n"
+					+ "1. Hablar \r\n" + 
+					"2. Esperar a recibir mensaje \r\n" + 
+					"3. Salir";
+		System.out.println(menu);
+	};
+	
+	// acaba Main
 }
